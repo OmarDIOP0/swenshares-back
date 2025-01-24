@@ -1,0 +1,11 @@
+Django==5.1.3
+django-filter==24.3
+django-simple-history==3.7.0
+djangorestframework==3.15.2
+drf-keycloak==1.0.0
+python-decouple==3.8
+django-filter
+drf-yasg==1.21.8
+mysqlclient==2.1.0
+pillow==11.0.0
+corsheaders

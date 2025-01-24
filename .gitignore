@@ -1,0 +1,15 @@
+#Environnement virtel 
+venv/
+env
+#Fichier de configuration de la base données
+
+env
+
+#Dossier logs
+logs/
+
+# Ignorer les fichiers compilés Python
+*.pyc
+
+# Ignorer les dossiers de cache Python
+__pycache__/

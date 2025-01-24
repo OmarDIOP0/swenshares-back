@@ -1,0 +1,257 @@
+# # Configuration GitLab CI/CD optimisée
+# image: docker:stable  # Image de base pour exécuter les jobs
+
+# services:
+#   - docker:dind      # Docker in Docker - permet d'exécuter Docker dans le pipeline
+
+# variables:
+#   DOCKER_HOST: tcp://docker:2375
+#   DOCKER_DRIVER: overlay2
+#   DJANGO_SETTINGS_MODULE: "swenshares.settings"
+#   PYTHONUNBUFFERED: "1"
+#   PORT: 8000
+
+# stages:
+#   - build
+#   - test
+#   - deploy
+
+# # Mise à jour du pipeline CI/CD
+# before_script:
+#   - apk add --no-cache --update mysql-client mysql-dev gcc g++ make
+#   - pip install -r requirements.txt
+
+# build:
+#   stage: build
+#   script:
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+#     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+#     # Tag 'latest' pour la branche dev
+#     - |
+#       if [ "$CI_COMMIT_BRANCH" = "dev" ]; then
+#         docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+#         docker push $CI_REGISTRY_IMAGE:latest
+#       fi
+#   rules:
+#     - if: $CI_COMMIT_BRANCH =~ /(test|dev|main)/
+
+# test:
+#   stage: test
+#   image: python:3.12
+#   script:
+#     - pip install -r requirements.txt
+#     - python manage.py test
+#   rules:
+#     - if: $CI_COMMIT_BRANCH =~ /(test|main)/
+
+# deploy:
+#   stage: deploy
+#   script:
+#     - pip install -r requirements.txt
+#     - python manage.py collectstatic --noinput
+#     - gunicorn SwenSharesBack.wsgi:application --bind 0.0.0.0:$PORT
+#   only:
+#     - main
+
+
+
+# # Configuration GitLab CI/CD optimisée
+# image: python:3.12
+
+# stages:
+#   - install
+#   - migrate
+#   - build
+#   - test
+#   - deploy
+
+
+# services:
+#   - mysql:5.7
+
+# variables:
+#   MYSQL_ROOT_PASSWORD: root
+#   MYSQL_DATABASE: swenshares_db
+#   MYSQL_USER: swenshares_user
+#   MYSQL_PASSWORD: P@ssword01
+
+#   # Configurations Django
+#   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+#   DJANGO_SETTINGS_MODULE: "swenshares.settings"
+#   PYTHONUNBUFFERED: "1"
+#   DB_ENGINE: django.db.backends.mysql
+#   DB_NAME: $MYSQL_DATABASE
+#   DB_USER: $MYSQL_USER
+#   DB_PASSWORD: $MYSQL_PASSWORD
+#   DB_HOST: mysql  # Nom de service correspondant à MySQL
+
+# cache:
+#   paths:
+#     - .cache/pip
+
+# install-dependencies:
+#   stage: install
+#   script:
+#     - echo "Créer et activer l'environnement virtuel..."
+#     - python -m venv venv
+#     - source venv/bin/activate
+#     - echo "Installer les dépendances..."
+#     - pip install --upgrade pip
+#     - pip install -r requirements.txt
+#   only:
+#     - test
+
+# run-migrations:
+#   stage: migrate
+#   script:
+#     - echo "Créer et activer l'environnement virtuel..."
+#     - python -m venv venv
+#     - source venv/bin/activate
+#     - echo "Installer les dépendances..."
+#     - pip install --upgrade pip
+#     - pip install -r requirements.txt
+#     - echo "Exécuter les migrations..."
+#     - export DB_ENGINE=$DB_ENGINE
+#     - export DB_NAME=$DB_NAME
+#     - export DB_USER=$DB_USER
+#     - export DB_PASSWORD=$DB_PASSWORD
+#     - export DB_HOST=$DB_HOST
+#     - export DB_PORT=$DB_PORT
+#     - python manage.py migrate
+#   dependencies:
+#     - install-dependencies
+#   only:
+#     - test
+
+# build-image:
+#   stage: build
+#   script:
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+#     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+#     - |
+#       if [ "$CI_COMMIT_BRANCH" = "dev" ]; then
+#         docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+#         docker push $CI_REGISTRY_IMAGE:latest
+#       fi
+#   rules:
+#     - if: $CI_COMMIT_BRANCH =~ /(test|dev|main)/
+
+# run-tests:
+#   stage: test
+#   script:
+#     - echo "Créer et activer l'environnement virtuel..."
+#     - python -m venv venv
+#     - source venv/bin/activate
+#     - echo "Installer les dépendances..."
+#     - pip install --upgrade pip
+#     - pip install -r requirements.txt
+#     - echo "Exécuter les tests unitaires..."
+#     - python manage.py test
+#   dependencies:
+#     - install-dependencies
+#   rules:
+#     - if: $CI_COMMIT_BRANCH =~ /(test|main)/
+
+
+# Configuration GitLab CI/CD optimisée pour un projet Django avec MySQL
+# Configuration GitLab CI/CD optimisée pour un projet Django avec MySQL
+
+image: python:3.12
+
+stages:
+  - install
+  - migrate
+  - build
+  - test
+  - deploy
+
+services:
+  - mysql:5.7
+
+variables:
+  MYSQL_ROOT_PASSWORD: root
+  MYSQL_DATABASE: swenshares_db
+  MYSQL_USER: swenshares_user
+  MYSQL_PASSWORD: P@ssword01
+
+  # Configurations Django
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  DJANGO_SETTINGS_MODULE: "swenshares.settings"
+  PYTHONUNBUFFERED: "1"
+  DB_ENGINE: django.db.backends.mysql
+  DB_NAME: $MYSQL_DATABASE
+  DB_USER: $MYSQL_USER
+  DB_PASSWORD: $MYSQL_PASSWORD
+  DB_HOST: mysql
+  DB_PORT: 3306
+
+cache:
+  paths:
+    - .cache/pip
+
+install-dependencies:
+  stage: install
+  script:
+    - echo "Créer et activer l'environnement virtuel..."
+    - python -m venv venv
+    - source venv/bin/activate
+    - echo "Installer les dépendances..."
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+  only:
+    - test
+
+run-migrations:
+  stage: migrate
+  script:
+    - echo "Créer et activer l'environnement virtuel..."
+    - python -m venv venv
+    - source venv/bin/activate
+    - echo "Installer les dépendances..."
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - echo "Exécuter les migrations..."
+    - python manage.py migrate
+  dependencies:
+    - install-dependencies
+  only:
+    - test
+
+build-image:
+  stage: build
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "dev" ]; then
+        docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+        docker push $CI_REGISTRY_IMAGE:latest
+      fi
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ /(test|dev|main)/
+
+run-tests:
+  stage: test
+  script:
+    - echo "Créer et activer l'environnement virtuel..."
+    - python -m venv venv
+    - source venv/bin/activate
+    - echo "Installer les dépendances..."
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - echo "Exécuter les tests unitaires..."
+    - python manage.py test
+  dependencies:
+    - install-dependencies
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ /(test|main)/
+
+deploy:
+  stage: deploy
+  script: echo "Définissez ici le script de déploiement"
+  environment: production
+  only:
+    - main
